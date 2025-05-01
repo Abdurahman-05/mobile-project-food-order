@@ -74,10 +74,13 @@ const loginController = async (req, res) => {
     return res.status(500).json({ error: "Server error occurred" });
   }
 };
+const logoutController = async (req,res)=>{
+}
 
 const authController = {
   registerController,
   loginController,
+  logoutController
 };
 
 export default authController;

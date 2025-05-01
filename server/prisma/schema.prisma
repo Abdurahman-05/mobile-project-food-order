@@ -90,6 +90,7 @@ model Product {
   name        String?
   description String?
   price       Float
+  ingredients  String[]
   isAvailable Boolean   @default(true)
   img         String?
   createdAt   DateTime  @default(now())

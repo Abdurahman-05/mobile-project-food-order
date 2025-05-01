@@ -4,10 +4,10 @@ import auth from "./routers/auth.js";
 import authMiddleHandler from "./middlewares/authMiddleware.js";
 import cors from "cors";
 import upload from "./config/multer.js";
-import getProfile from "./controllers/product.js";
 import fs from "fs"
 import { fileURLToPath } from "url";
 import path from 'path'
+import product from "./routers/product.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -24,8 +24,7 @@ app.get("/signup", async (req, res) => {
 });
 
 app.use("/", auth);
-
-app.post('/api/profile',upload.single('img'),getProfile)
+app.use('/',product)
 
 app.listen(5000, () => {
   console.log("✅ Server running on http://localhost:5000");
