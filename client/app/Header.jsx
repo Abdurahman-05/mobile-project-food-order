@@ -9,7 +9,6 @@ import { useFavorite } from './GlobalContext/FavoriteContext';
  const Header = () => {
 
   const route = useRouter()
-  const navigation = useNavigation()
   const {name} = useFavorite()
   
   return (

@@ -1,19 +1,22 @@
 import React,{useState,createContext, useContext, useEffect} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import axios from "axios"
+
 const RecipeFavorite = createContext()
 
 export const useFavorite = () => useContext(RecipeFavorite)
 
  const FavoriteProvider = ({children}) => {
 
-    const route = useRouter()
+    const router = useRouter()
     const [favorite,setFavorite] = useState([])
     const [cart,setCart] = useState([])
     const [error,setError] = useState('')
 
     //useState for sign
-    const [username,setUsername] = useState('')
+    const [firstname,setFirstName] = useState('')
+    const [lastname,setLastName] = useState('')
     const [email,setEmail] = useState('') 
     const [password,setPassword] = useState('')
     const [account,setAccount] = useState([])
@@ -98,79 +101,89 @@ export const useFavorite = () => useContext(RecipeFavorite)
      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
      const handleSignup = async () => {
-       if(!username || !email || !password) {
+       if(!firstname || !email || !password || !lastname) {
          alert('Please fill all fields')
        }else if(!emailRegex.test(email)) {
          alert('Please enter a valid email')
        }else if(password.length < 6) {
          alert('Password must be at least 6 characters')
-       }else if(authUsername(username)){
-         alert('Username already exists')
-       }else if(authEmail(email)){
-         alert('Email already in use')
        }else {
-         const updatedAccount = [...account, {"username":username,"email":email,"password":password}]
-         setAccount(updatedAccount)
-         await AsyncStorage.setItem('account',JSON.stringify(updatedAccount))
-         setUsername('')
-         setEmail('')
-         setPassword('')
-         alert('Signup successful')
+
+        const data = {
+         firstname:firstname,
+         lastname:lastname,
+         email:email,
+         password:password
+        }
+         
+        axios.post("http://localhost:8000/signup",data)
+         .then(res => {
+            console.log(res.data); 
+            alert('User registered successfully')
+            setFirstName('')
+            setLastName('')
+            setEmail('')
+            setPassword('')
+            
+         })
+         .catch(error => {
+            if (error.response) {
+               if (error.response.status === 409) {
+                  alert('Email is already registered! Try another one.');
+               }else if(error.response.status === 500){
+                  alert('Server error during registration.')
+               }
+            }else{
+               alert('Network error. Please check your connection and try again.');
+            }
+            setFirstName('')
+            setLastName('')
+            setEmail('')
+            setPassword('')
+            
+         })
        } 
       }
 
-      const authUsername = (username) => {
-         let is_Exist = false
-          account.map((item) => {
-                if(item.username === username){
-                   is_Exist = true
-                }
-          })
-          return is_Exist
-      }
-
-      const authEmail = (email) => {
-         let is_Exist = false
-          account.map((item) => {
-                if(item.email === email){
-                   is_Exist = true
-                }
-          })
-          return is_Exist
-      }
 
 
       //function to handle signin
       const handleSignin = async () => {
          if(!emailSignin || !passwordSignin) {
             alert('Please fill all fields')
-         }else if(!auth(emailSignin,passwordSignin)){
-            alert('Invalid Credintials')
-         }else {
-            setEmailSignin('')
-            setPasswordSignin('')
-
-            account.forEach((item) => {
-               if(item.password === passwordSignin && item.email === emailSignin){
-                  setName(item.username)
-               }
-            })
-            console.log(name);
+         }else if(!emailRegex.test(emailSignin)) {
+            alert('Please enter a valid email')
+        } else {
+               const data = {
+               email:emailSignin,
+               password:passwordSignin
+            } 
             
-            await AsyncStorage.setItem("name", JSON.stringify(name));
-            route.push('/(tabs)/Home')
+            axios.post("http://localhost:8000/signin",data)
+            .then(res => {
+
+               
+               setEmailSignin('')
+               setPasswordSignin('') 
+               router.replace("/(tabs)/Home")
+
+            })
+            .catch(error => {
+               if (error.response) {
+                  if(error.response.status === 400){
+                     alert("Invalid Password! Please try again.")
+                  }else if(error.response.status === 404){
+                     alert("User not found! Please try again.")
+                  }
+               }else{
+                  alert('Network error. Please check your connection and try again.');
+               }  
+               setEmailSignin('')
+               setPasswordSignin('') 
+            })
          }
       }
 
-      const auth = (email,password) => {
-         let is_Exist = false
-          account.map((item) => {
-                if(item.email === email && item.password === password){
-                   is_Exist = true
-                }
-          })
-          return is_Exist
-      }
 
     return <RecipeFavorite.Provider value={{
          addToFavorite,
@@ -181,13 +194,15 @@ export const useFavorite = () => useContext(RecipeFavorite)
          removeFromCart,
          isInTheCart,
          cart,
-         setUsername,
          setEmail,
          setPassword,
          handleSignup,
          email,
          password,
-         username,
+         firstname,
+         lastname,
+         setFirstName,
+         setLastName,
          setPasswordSignin,
          setEmailSignin,
          emailSignin,

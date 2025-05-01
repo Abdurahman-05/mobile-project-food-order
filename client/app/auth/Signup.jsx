@@ -12,7 +12,7 @@ const Signup = () => {
 
   const router = useRouter()
 
-  const {handleSignup,setEmail,setPassword,setUsername,username,email,password} = useFavorite()
+  const {handleSignup,setEmail,setPassword,setFirstName,setLastName,firstname,lastname, email,password} = useFavorite()
   const [showPassword,setShowPassword] = useState(false)
 
   return (
@@ -23,7 +23,8 @@ const Signup = () => {
         <View style={{backgroundColor:'rgba(0,0,0,0.5)',flex:1,alignItems:'center',justifyContent:'center',paddingTop:40}}>
           <Text style={styles.signupText}>Signup</Text>
           <Text style={{marginBottom:29,fontSize:13}}>Create your account</Text>
-          <TextInput onChangeText={(text) => setUsername(text.toLowerCase())} value={username} style={styles.textInput} placeholder='username' placeholderTextColor={Colors.lightGray} autoCapitalize="none" />
+          <TextInput onChangeText={(text) => setFirstName(text.toLowerCase())} value={firstname} style={styles.textInput} placeholder='First Name' placeholderTextColor={Colors.lightGray} autoCapitalize="none" />
+          <TextInput onChangeText={(text) => setLastName(text.toLowerCase())} value={lastname} style={styles.textInput} placeholder='Last Name' placeholderTextColor={Colors.lightGray} autoCapitalize="none" />
           <TextInput onChangeText={(text) => setEmail(text)} value={email} style={styles.textInput} placeholder='Email' placeholderTextColor={Colors.lightGray} />
           <View style={{flexDirection:'row',position:'relative'}}>
              <TextInput onChangeText={(text) => setPassword(text)} value={password} style={styles.textInput} secureTextEntry={ showPassword ? false : true } placeholder='Password' placeholderTextColor={Colors.lightGray} />
