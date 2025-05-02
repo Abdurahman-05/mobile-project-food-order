@@ -3,21 +3,24 @@ import prisma from "../prisma/client.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import AppError from "../utils/appError.js";
 
-const registerController = async (req, res) => {
-  const { username, email, password} =
-    req.body;
-  // console.log(req.body);
 
-  const duplicateUser = await prisma.user.findUnique({ where: { email } });
-  if (duplicateUser) {
-    return res
-      .status(400)
-      .json({ error: "User already exists with this email" });
-  }
+
+
+
+const registerController = async (req, res, next) => {
+  const { username, email, password } = req.body;
 
   try {
+    const duplicateUser = await prisma.user.findUnique({ where: { email } });
+
+    if (duplicateUser) {
+      return next(new AppError("User already exists with this email", 400));
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -25,6 +28,7 @@ const registerController = async (req, res) => {
         password: hashedPassword,
       },
     });
+
     const accessToken = jwt.sign(
       {
         id: newUser.id,
@@ -38,26 +42,24 @@ const registerController = async (req, res) => {
       .status(201)
       .json({ accessToken, message: "User registered successfully" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Server error occurred" });
+    return next(error); 
   }
 };
 
-const loginController = async (req, res) => {
+
+const loginController = async (req, res,next) => {
   const { email, password } = req.body;
 
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
-    return res.status(400).json({ error: "User are not registerd!!!" });
+    return next(new AppError("User not registered", 400));
   }
 
   try {
     const check_password = await bcrypt.compare(password, user.password);
     if (!check_password) {
-      return res.status(400).json({
-        error: "incorrect password!!!!!!",
-      });
+      return next(new AppError("Incorrect password", 400));
     }
     const accessToken = jwt.sign(
       {
@@ -70,14 +72,15 @@ const loginController = async (req, res) => {
 
     return res.json({ accessToken, message: "Login successful" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Server error occurred" });
+    return next(error);
   }
 };
+const logoutController = async (req, res,next) => {};
 
 const authController = {
   registerController,
   loginController,
+  logoutController,
 };
 
 export default authController;

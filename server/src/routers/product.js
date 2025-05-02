@@ -1,12 +1,15 @@
-// import express from "express";
+import express from "express";
+import upload from "../config/multer.js";
+import productHandler from "../controllers/product.controller.js";
 
 
 
-// const product = express.Router();
+const product = express.Router();
 
-// product.get("/", );
-// product.post("/", authController.loginController);
+product.post("/api/product", upload.single('img'),productHandler.createProduct);
+product.get("/api/products",productHandler.getAllProducts);
+product.get("/products",productHandler.deleteAllProducts);
 
 
 
-// export default product;
+export default product;

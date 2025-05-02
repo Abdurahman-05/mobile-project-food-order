@@ -13,53 +13,14 @@ const __dirname = path.dirname(__filename);
 
 
 
-// const getProfile = async (req, res) => {
-//   try {
-//     if (!req.file)
-//       return res.status(400).json({ message: "No logo image uploaded" });
-//     if (!req.file.mimetype.startsWith("image/"))
-//       return res.status(400).json({ message: "Uploaded file is not an image" });
 
-//     const resizedBuffer = await sharp(req.file.buffer)
-//       .resize(200, 200, { fit: "contain" })
-//       .jpeg({ quality: 90 })
-//       .toBuffer();
-
-//     // // // Define file path'
-//     const cleanFileName = req.file.originalname.replace(/\s+/g, "-");
-//     let filename = cleanFileName.split(".")[0];
-//     filename = `${filename}-${Date.now()}.jpeg`;
-//     const uploadDir = path.join(__dirname, "../uploads");
-//     const filePath = path.join(uploadDir, filename);
-
-//     if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-//     await fs.promises.writeFile(filePath, resizedBuffer);
-
-//     const product = await prisma.product.create({
-//       data: {
-//         ...req.body,
-//         price: parseFloat(req.body.price),
-//         img: `/uploads/${filename}`,
-//       },
-//     });
-
-//     res.status(201).json(product);
-//   } catch (error) {
-//     console.error("Error creating job:", error);
-//     res.status(500).json({ message: "Failed to create job" });
-//   }
-// };
-
-const getProfile = async(req,res) => {
- 
+const createProduct = async(req,res) => {
+  const ingredients = JSON.parse(req.body.ingredients);
   try {
       if (!req.file) return res.status(400).json({ message: 'No logo image uploaded' });
       if (!req.file.mimetype.startsWith('image/')) return res.status(400).json({ message: 'Uploaded file is not an image' });
       
       const resizedBuffer = await sharp(req.file.buffer)
-      .resize(200,200,{fit:"contain"})
-      .jpeg({ quality: 90 })
       .toBuffer();
       
       // // // Define file path'
@@ -80,6 +41,7 @@ const getProfile = async(req,res) => {
      const product = await prisma.product.create({
       data: {
         ...req.body,
+        ingredients:ingredients,
         price: parseFloat(req.body.price),
         img: `/uploads/${filename}`,
       },
@@ -91,18 +53,38 @@ const getProfile = async(req,res) => {
       res.status(500).json({ message: 'Failed to create job' });
   }
 };
-export default getProfile;
+
+const getAllProducts = async (req, res) => {
+    try{
+      const products = await prisma.product.findMany();
+      if(!products || products.length === 0) return res.status(404).json({ message: 'No products found' });
+      res.status(200).json(products);
+
+    }catch(error){
+        console.error('Error :', error);
+        res.status(500).json({error: "something error happend" });
+    }
+}
+
+const deleteAllProducts = async (req, res) => {
+  try {
+    const products = await prisma.product.deleteMany();
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Error :', error);
+    res.status(500).json({ error: "something error happend" });
+  }
+}
 
 
 
 
 
-// const jobHandler = {
-// getJob,
-// createJob,
-// updeatJob,
-// getJobById,
-// removeJob,
-// getProfile
-// };
-// export default jobHandler;
+
+
+const productHandler = {
+  createProduct,
+  getAllProducts,
+  deleteAllProducts
+};
+export default productHandler;
