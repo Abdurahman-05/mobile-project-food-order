@@ -75,6 +75,8 @@ const loginController = async (req, res,next) => {
     return next(error);
   }
 };
+
+
 const logoutController = async (req, res,next) => {};
 
 const authController = {
