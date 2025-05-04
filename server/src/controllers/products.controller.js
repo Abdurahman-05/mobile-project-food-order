@@ -62,7 +62,13 @@ const createProduct = async (req, res, next) => {
   }
 };
 
-const deletProduct = async () => {};
+// const deletProduct = async () => {
+//   const product = req.body;
+
+//   const deletedProduct = await prisma.product.findUnique({
+//     id : product;
+//   })
+// };
 
 const deleteAllProducts = async (req, res) => {
   try {
