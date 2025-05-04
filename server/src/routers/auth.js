@@ -6,7 +6,8 @@ const auth = express.Router();
 
 auth.post("/auth/signup", authController.registerController);
 auth.post("/auth/login", authController.loginController);
-// auth.post("api/auth/logout", authController.logoutController);
+
+
 
 
 

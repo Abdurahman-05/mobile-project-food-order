@@ -29,7 +29,7 @@ const createProduct = async (req, res, next) => {
     if (!req.file)
       return res.status(400).json({ message: "No logo image uploaded" });
     if (!req.file.mimetype.startsWith("image/"))
-      return res.status(400).json({ message: "Uploaded file is not an image" });
+      return next(new AppError("Uploaded file is not an image",400));
 
     const resizedBuffer = await sharp(req.file.buffer).toBuffer();
 
@@ -37,13 +37,12 @@ const createProduct = async (req, res, next) => {
     const cleanFileName = req.file.originalname.replace(/\s+/g, "-");
     let filename = cleanFileName.split(".")[0];
     filename = `${filename}-${Date.now()}.jpeg`;
-    const uploadDir = path.join(__dirname, "../uploads");
+    const uploadDir = path.join(__dirname, "../uploads/product");
     const filePath = path.join(uploadDir, filename);
 
-    // // // Ensure upload directory exists
+
     if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-    // // // Save the processed image
     await fs.promises.writeFile(filePath, resizedBuffer);
 
     // // Create job entry in database
@@ -52,13 +51,13 @@ const createProduct = async (req, res, next) => {
         ...req.body,
         ingredients: ingredients,
         price: parseFloat(req.body.price),
-        img: `/uploads/${filename}`,
+        img: `/uploads/product/${filename}`,
       },
     });
+    res.status(200).json({message:"produact created successfully" , product})
 
   } catch (error) {
-    console.error("Error :", error);
-    res.status(500).json({ message: "Failed to create job" });
+    return next(new AppError("Failed to create job",500));
   }
 };
 

@@ -71,7 +71,7 @@ const loginController = async (req, res,next) => {
       },
       process.env.ACCESS_TOKEN
     );
-
+    console.log(accessToken);
     return res.json({ accessToken, message: "Login successful" });
   } catch (error) {
     return next(error);

@@ -8,10 +8,10 @@ import authMiddleHandler from "../middlewares/authMiddleware.js";
 
 const product = express.Router();
 
-product.post("/products",authMiddleHandler,authorizeRoles("ADMIN"), upload.single('img'),productcontroller.createProduct);
+product.post("/products",authorizeRoles("ADMIN"), upload.single('img'),productcontroller.createProduct);
 product.get("/products",productcontroller.getAllProducts);
-// product.delete("/products",productcontroller.deleteAllProducts);
-product.delete("/products/:id",productcontroller.deleteProduct);
+product.delete("/products/del",authorizeRoles("ADMIN"),productcontroller.deleteAllProducts);
+product.delete("/products/:id",authorizeRoles("ADMIN"),productcontroller.deleteProduct);
 
 
 
