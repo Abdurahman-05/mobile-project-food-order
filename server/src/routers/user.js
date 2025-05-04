@@ -8,9 +8,8 @@ import authMiddleHandler from "../middlewares/authMiddleware.js";
 
 const user = express.Router();
 
-user.get("/users/me",authMiddleHandler,userController.getProfile);
-user.put("/users/me",authMiddleHandler,userController.updateProfile);
-
+user.get("/users/me",userController.getProfile);
+user.put("/users/me",upload.single("img"),userController.updateProfile);
 
 
 export default user;
