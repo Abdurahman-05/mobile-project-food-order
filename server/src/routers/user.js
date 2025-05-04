@@ -8,8 +8,8 @@ import authMiddleHandler from "../middlewares/authMiddleware.js";
 
 const user = express.Router();
 
-user.get("/api/users/me",authMiddleHandler,userController.getProfile);
-user.put("/api/users/me",authMiddleHandler,userController.updateProfile);
+user.get("/users/me",authMiddleHandler,userController.getProfile);
+user.put("/users/me",authMiddleHandler,userController.updateProfile);
 
 
 
