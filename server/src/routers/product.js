@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../config/multer.js";
-import productHandler from "../controllers/product.controller.js";
+import productHandler from "../controllers/products.controller.js";
 
 
 
