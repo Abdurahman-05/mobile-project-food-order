@@ -56,7 +56,6 @@ const createProduct = async (req, res, next) => {
       },
     });
 
-    res.status(201).json(product);
   } catch (error) {
     console.error("Error :", error);
     res.status(500).json({ message: "Failed to create job" });

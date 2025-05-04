@@ -34,6 +34,7 @@ const registerController = async (req, res, next) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
+        role:newUser.role
       },
       process.env.ACCESS_TOKEN
     );
@@ -66,6 +67,7 @@ const loginController = async (req, res,next) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        role:user.role
       },
       process.env.ACCESS_TOKEN
     );
