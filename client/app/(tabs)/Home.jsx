@@ -1,30 +1,27 @@
-import { View, Text, Image, StyleSheet, TextInput, Dimensions, ScrollView, TouchableWithoutFeedback } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, Dimensions, ScrollView, TouchableWithoutFeedback,Pressable } from "react-native";
 import React, { useState } from "react";
-import productList from "../../data/Products";
+import SampleProduct from "../../data/Products";
 import Header from "../Header";
 import RecipeItem from "../RecipeItem";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { FlatList } from "react-native";
 import { Colors } from "@/app-example/constants/Colors";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
+import { useFavorite } from "../GlobalContext/FavoriteContext";
 var {width,height} = Dimensions.get('window')
 
 
 export default function Home() {
 
+  const {product} = useFavorite()
   const navigation = useNavigation()
-
-
-  const handleNavigation = (productId) => {
-    navigation.navigate("Details",{id:productId})
-  }
+ 
 
   const handleSearch = (event) => {
      setSearch(event.target.value)
   }
 
-
+  
 
   
   return (
@@ -46,29 +43,33 @@ export default function Home() {
             horizontal
             showsHorizontalScrollIndicator={false}
             nestedScrollEnabled={true}
-            data={productList}
+            data={SampleProduct}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.imageWrapper}
             renderItem={({ item }) => (
               <View style={{position:'relative'}}>
                   <Image style={styles.slideImage} source={item.image} />
-                  <TouchableWithoutFeedback onPress={() => handleNavigation(item.id)}>
                     <View style={{backgroundColor:'linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.9))',position:'absolute',width:width*0.86,height:'100%',borderRadius:30,display:'flex',justifyContent:'flex-end',alignItems:'center'}}>
                       <Text style={{fontFamily:'outfit',fontSize:20,color:'white',marginBottom:0}}>{item.title}</Text>
                       <Text style={{color:'white',marginBottom:10,textAlign:'center',fontFamily:'outfit',fontSize:12,width:'80%'}}>{item.detail.slice(0,80)+'...'}</Text>
                     </View>
-                  </TouchableWithoutFeedback>
               </View>
             )}
           />
         </View>
 
+
         <View style={{marginTop:20,paddingBottom:100}}>
           <Text style={{fontSize:27,textAlign:'center',marginBottom:10,fontWeight:'bold'}}>Feature Product</Text>
           <View style={{flex:1, flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:10}}>
-            {productList.map((item) => (
-               <RecipeItem key={item.id} item={item} />
-            ))}
+          {
+               product && product?.length > 0  ?
+               product.map((item) => (
+                 <RecipeItem key={item.id} item={item} />
+                )) : <View style={{justifyContent:'center',alignItems:'center',height:height*0.3}}>
+                       <Text style={{fontSize:17,textAlign:'center',marginTop:20}}>No Product Found</Text>
+                    </View>
+            }
           </View>
         </View>
 

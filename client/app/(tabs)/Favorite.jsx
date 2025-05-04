@@ -23,7 +23,7 @@ const Favorite = () => {
 
 
         <View style={{flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:10}}>
-        {favorite && favorite.length > 0 ? (
+        {favorite && favorite?.length > 0 ? (
             favorite.map(item => (
                 <RecipeItem key={item.id} item={item} />
             ))

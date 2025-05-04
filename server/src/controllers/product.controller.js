@@ -17,6 +17,7 @@ const __dirname = path.dirname(__filename);
 const createProduct = async(req,res) => {
   const ingredients = JSON.parse(req.body.ingredients);
   try {
+      
       if (!req.file) return res.status(400).json({ message: 'No logo image uploaded' });
       if (!req.file.mimetype.startsWith('image/')) return res.status(400).json({ message: 'Uploaded file is not an image' });
       
