@@ -4,6 +4,7 @@ import sharp from "sharp";
 import fs from "fs";
 import { PrismaClient } from "@prisma/client";
 import { fileURLToPath } from "url";
+import AppError from "../utils/appError.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -62,6 +63,43 @@ const createProduct = async (req, res, next) => {
   }
 };
 
+
+const deleteAllProducts = async (req, res, next) => {
+  try {
+    const products = await prisma.product.deleteMany();
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error :", error);
+    return next(new AppError("something error happend", 500));
+  }
+};
+
+const deleteProduct = async (req, res, next) => {
+  
+  const {id}= req.params;
+  console.log(id)
+  try {
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: id },
+    });
+
+    if (!existingProduct) {
+      return next(new AppError("Product not found", 404));
+    }
+    const deletedProduct = await prisma.product.delete({
+      where: { id: id },
+    });
+
+    res.status(200).json({
+      message: 'Product deleted successfully',
+      product: deletedProduct,
+    });
+  } catch (error) {
+    console.error(error);
+    return next(new AppError("Product not found or already deleted", 404));
+  }
+};
+
 // const deletProduct = async () => {
 //   const product = req.body;
 
@@ -70,19 +108,11 @@ const createProduct = async (req, res, next) => {
 //   })
 // };
 
-const deleteAllProducts = async (req, res) => {
-  try {
-    const products = await prisma.product.deleteMany();
-    res.status(200).json(products);
-  } catch (error) {
-    console.error("Error :", error);
-    res.status(500).json({ error: "something error happend" });
-  }
-};
 
-const productHandler = {
+const productcontroller = {
   createProduct,
   getAllProducts,
   deleteAllProducts,
+  deleteProduct
 };
-export default productHandler;
+export default productcontroller;

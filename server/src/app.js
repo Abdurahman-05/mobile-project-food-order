@@ -39,11 +39,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from 'dotenv'
 import prisma from "./prisma/client.js";
-import auth from "./routers/auth.js";
-import product from "./routers/product.js";
 import upload from "./config/multer.js"; // Assuming you're using it in routes
 import errorMiddleware from "./middlewares/errorHandler.middleware.js";
 import user from "./routers/user.js";
+import auth from "./routers/auth.js";
+import product from "./routers/product.js";
 
 
 dotenv.config();
@@ -63,9 +63,9 @@ app.get("/signup", async (req, res) => {
 });
 
 
-app.use("/", auth);
-app.use("/", product);
-app.use("/", user);
+app.use("/api", auth);
+app.use("/api", product);
+app.use("/api", user);
 // app.use("/", order);
 // app.use("/", favorite);
 
