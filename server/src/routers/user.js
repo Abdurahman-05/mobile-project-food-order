@@ -4,8 +4,6 @@ import productHandler from "../controllers/products.controller.js";
 import userController from "../controllers/users.controller.js";
 import authMiddleHandler from "../middlewares/authMiddleware.js";
 
-
-
 const user = express.Router();
 
 user.get("/users/me",userController.getProfile);

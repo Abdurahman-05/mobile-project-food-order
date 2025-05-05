@@ -5,6 +5,7 @@ import fs from "fs";
 import { PrismaClient } from "@prisma/client";
 import { fileURLToPath } from "url";
 import AppError from "../utils/appError.js";
+import { notifyUsersAboutNewProduct } from "../utils/notificationUtils.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -45,7 +46,7 @@ const createProduct = async (req, res, next) => {
 
     await fs.promises.writeFile(filePath, resizedBuffer);
 
-    // // Create job entry in database
+    // Create product entry in database
     const product = await prisma.product.create({
       data: {
         ...req.body,
@@ -54,7 +55,17 @@ const createProduct = async (req, res, next) => {
         img: `/uploads/product/${filename}`,
       },
     });
-    res.status(200).json({message:"produact created successfully" , product})
+    
+    // Send notification to all users about the new product
+    try {
+      const notificationCount = await notifyUsersAboutNewProduct(product);
+      console.log(`Sent notifications to ${notificationCount} users about new product: ${product.name}`);
+    } catch (notificationError) {
+      console.error("Error sending new product notifications:", notificationError);
+      // Continue with response even if notifications fail
+    }
+    
+    res.status(200).json({message:"Product created successfully" , product})
 
   } catch (error) {
     return next(new AppError("Failed to create job",500));
