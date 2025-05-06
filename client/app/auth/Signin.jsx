@@ -21,7 +21,7 @@ const Signin = () => {
     setPasswordSignin,
     emailSignin,
     passwordSignin,
-    loading
+    loginLoading
   } = useFavorite();
   return (
     <ImageBackground
@@ -64,7 +64,7 @@ const Signin = () => {
               fontSize: 16,
             }}
           >
-            {loading ? "Loading..." : "Sign in"}
+            {loginLoading ? "Loading..." : "Sign in"}
           </Text>
         </TouchableOpacity>
         <View

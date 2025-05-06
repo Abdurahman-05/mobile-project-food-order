@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, TextInput, Dimensions, ScrollView, TouchableWithoutFeedback,Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SampleProduct from "../../data/Products";
 import Header from "../Header";
 import RecipeItem from "../RecipeItem";
@@ -8,12 +8,25 @@ import { FlatList } from "react-native";
 import { Colors } from "@/app-example/constants/Colors";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useFavorite } from "../GlobalContext/FavoriteContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 var {width,height} = Dimensions.get('window')
+import axios from "axios";
 
 
 export default function Home() {
 
-  const {product} = useFavorite()
+  const {
+    product,
+    loading,
+    setLoading,
+    setGetProfileEmail,
+    setGetProfilePassword,
+    setGetProfileUsername,
+    getProfileImage,
+    setGetProfileImage,
+    setGetProfileRole,
+    setProduct
+  } = useFavorite()
   const navigation = useNavigation()
  
 
@@ -21,8 +34,54 @@ export default function Home() {
      setSearch(event.target.value)
   }
 
+  useEffect(() => {
+
+    const getData = async () => {
+      const token = await AsyncStorage.getItem("token");
+
+      axios.get("http://localhost:5000/api/users/me", {headers: { Authorization: `Bearer ${token}`}})
+      .then(res => {
+        const {username,email,image,role} = res.data.myProfile
+        // console.log(res.data);
+        
+        setGetProfileEmail(email)
+        setGetProfileUsername(username)
+        setGetProfileImage(image)
+        setGetProfileRole(role)
+        
+      })
+      .catch(error => {
+        console.log("the error is: ",error);
+        
+      })   
+    }
+
+
+
+    const getProduct = async () => {
+      setLoading(true)
+      const token = await AsyncStorage.getItem("token");
+      axios.get("http://localhost:5000/api/products",{headers: { Authorization: `Bearer ${token}`}})
+      .then(res => {
+         setProduct(res.data)
+         setLoading(false)
+      })
+      .catch(error => {
+         console.log(error);
+         setLoading(false)
+      })
+   }
+
+    getData()
+    getProduct()
+  },[])
+
   
 
+
+
+  
+  console.log(product);
   
   return (
     <>
@@ -61,16 +120,22 @@ export default function Home() {
 
         <View style={{marginTop:20,paddingBottom:100}}>
           <Text style={{fontSize:27,textAlign:'center',marginBottom:10,fontWeight:'bold'}}>Feature Product</Text>
-          <View style={{flex:1, flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:10}}>
           {
-               product && product?.length > 0  ?
-               product.map((item) => (
-                 <RecipeItem key={item.id} item={item} />
-                )) : <View style={{justifyContent:'center',alignItems:'center',height:height*0.3}}>
-                       <Text style={{fontSize:17,textAlign:'center',marginTop:20}}>No Product Found</Text>
+            loading ? <View style={{flex:1,justifyContent:"center",alignItems:"center",width:"100%",textAlign:"center",height:230}}><Text>Loading...</Text></View> : 
+            <View style={{flex:1, flexDirection:'row',flexWrap:'wrap',justifyContent:'center',gap:10}}>
+            {
+                 product && product?.length > 0  ?
+                 product.map((item) => (
+                    <View key={item.id}>
+                       {item.img && <RecipeItem key={item.id} item={item} />}
                     </View>
-            }
-          </View>
+                  )) : <View style={{justifyContent:'center',alignItems:'center',height:height*0.3}}>
+                         <Text style={{fontSize:17,textAlign:'center',marginTop:20}}>No Product Found</Text>
+                      </View>
+              }
+            </View>
+          }
+      
         </View>
 
       </ScrollView>

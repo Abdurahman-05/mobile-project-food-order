@@ -7,15 +7,15 @@ import React,{useEffect} from "react";
 export default function Index() {
 
   const router = useRouter()
-  const {isLoggedIn} = useFavorite()
+  // const {isLoggedIn} = useFavorite()
 
 
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      router.push("/(tabs)/Home");
-    }
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     router.push("/(tabs)/Home");
+  //   }
+  // }, [isLoggedIn]);
 
   return (
     <View style={styles.container} >

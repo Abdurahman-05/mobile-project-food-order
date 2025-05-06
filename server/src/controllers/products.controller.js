@@ -86,7 +86,6 @@ const deleteAllProducts = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
   
   const {id}= req.params;
-  console.log(id)
   try {
     const existingProduct = await prisma.product.findUnique({
       where: { id: id },

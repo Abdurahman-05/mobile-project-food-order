@@ -8,7 +8,7 @@ import { useNavigation } from "expo-router";
 
 const Favorite = () => {
   const { favorite } = useFavorite()
-
+ 
   const navigation = useNavigation()
   return (
     <ScrollView style={{flex:1,backgroundColor:"white"}}>

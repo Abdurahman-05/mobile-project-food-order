@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 
 
 const registerController = async (req, res, next) => {
-  const { username, email, password } = req.body;
+  const { username, email, password,usertype } = req.body;
 
   try {
     if (!req.file)
@@ -50,7 +50,11 @@ const registerController = async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
+<<<<<<< HEAD
         img: `/uploads/profile/${filename}`,
+=======
+        role:usertype,
+>>>>>>> a827c7e (role based register setup and  admin page added)
       },
     });
 
@@ -65,7 +69,11 @@ const registerController = async (req, res, next) => {
     );
     return res
       .status(201)
+<<<<<<< HEAD
       .json({newUser, accessToken, message: "User registered successfully" });
+=======
+      .json({ accessToken, message: "User registered successfully",role:newUser.role });
+>>>>>>> a827c7e (role based register setup and  admin page added)
   } catch (error) {
     return next(error);
   }
@@ -94,8 +102,8 @@ const loginController = async (req, res, next) => {
       },
       process.env.ACCESS_TOKEN
     );
-    console.log(accessToken);
-    return res.json({ accessToken, message: "Login successful" });
+
+    return res.json({ token:accessToken, message: "Login successful" ,role:user.role});
   } catch (error) {
     return next(error);
   }

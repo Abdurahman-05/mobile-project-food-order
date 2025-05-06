@@ -19,19 +19,18 @@ export const useFavorite = () => useContext(RecipeFavorite)
     const [isLoggedIn,setIsLoggedIn] = useState(false)
     const [loading,setLoading] = useState(false)
 
-    //useState for sign
+
+    //useState for signup
     const [username,setUsername] = useState('')
-   //  const [lastname,setLastName] = useState('')
     const [email,setEmail] = useState('') 
     const [password,setPassword] = useState('')
     const [account,setAccount] = useState([])
+    const [role,setRole] = useState('USER')
 
     //useState for signin
     const[emailSignin,setEmailSignin] = useState('')
     const[passwordSignin,setPasswordSignin] = useState('')
-
-
-    const[name,setName] = useState('')
+    const [loginLoading,setLoginLoading] = useState(false)
 
     // useState for Create Product
     const [foodName,setFoodName] = useState('')
@@ -40,17 +39,21 @@ export const useFavorite = () => useContext(RecipeFavorite)
     const [ingredients,setIngredients] = useState("")
     const [image,setImage] = useState(null)
 
+    // usestate for edit profile
+    const [editUsername,setEditUsername] = useState("")
+    const [editPassword,setEditPassword] = useState("")
+    const [editEmail,setEditEmail] = useState("")
+    const [editImage,setEditImage] = useState(null)
+
+    //useState for getFrofile
+      const [getProfileEmail,setGetProfileEmail] = useState("")
+      const [getProfilePassword,setGetProfilePassword] = useState("..............")
+      const [getProfileUsername,setGetProfileUsername] = useState("")
+      const [getProfileImage,setGetProfileImage] = useState(null)
+      const [getProfileRole,setGetProfileRole] = useState("")
+
     useEffect(() => {
-
-      axios.get("http://10.240.212.213:5000/api/products")
-      .then(res => {
-         setProduct(res.data)
-
-      })
-      .catch(error => {
-         console.log(error);
-      })
-
+  
       //Load Logged use
       const loadLoggedUser = async() => {
          const storedUser = JSON.parse(await AsyncStorage.getItem('user'))
@@ -58,12 +61,7 @@ export const useFavorite = () => useContext(RecipeFavorite)
             setIsLoggedIn(storedUser)
          }
       }
-      const laodName = async() => {
-         const storedName = await AsyncStorage.getItem('name')
-         if(storedName){
-            setName(JSON.parse(storedName))
-         }
-      }
+
       const loadFavorites = async() => {
          const storedFavorite = await AsyncStorage.getItem('favorites')
          if(storedFavorite){
@@ -78,6 +76,7 @@ export const useFavorite = () => useContext(RecipeFavorite)
          }
       }
 
+      
       const loadAccount = async() => {
          const storedAccount = await AsyncStorage.getItem('account')
          if(storedAccount){
@@ -85,11 +84,10 @@ export const useFavorite = () => useContext(RecipeFavorite)
          }
       }
 
-
+      // getProduct()
       loadFavorites()
       loadCart()
       loadAccount()
-      laodName()
       loadLoggedUser()
     },[])
 
@@ -116,7 +114,7 @@ export const useFavorite = () => useContext(RecipeFavorite)
          await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
     }
 
-    console.log("cart in context",typeof(cart));
+    
     
     const removeFromCart = async (recipeId) => {
       const updatedCart = cart.filter(item => item.id !== recipeId)
@@ -143,20 +141,24 @@ export const useFavorite = () => useContext(RecipeFavorite)
         const data = {
          username:username,
          email:email,
-         password:password
+         password:password,
+         usertype:role
         }
-         
-        axios.post("http://10.240.212.213:5000/signup",data)
+        
+        axios.post("http://localhost:5000/api/auth/signup",data)
          .then(res => { 
-            alert('User registered successfully')
+            alert('User registered successfully',res)
             setUsername('')
             setEmail('')
             setPassword('')
+            // console.log(res);
             
          })
          .catch(error => {
-            if (error.response.status === 400) {
-               alert(error)
+            if(error.response){
+               if (error.response.status === 400) {
+                  alert(error)
+               }
             }else{
                alert('Network error. Please check your connection and try again.');
             }
@@ -176,66 +178,62 @@ export const useFavorite = () => useContext(RecipeFavorite)
          }else if(!emailRegex.test(emailSignin)) {
             alert('Please enter a valid email')
         } else {
-               const data = {
-               email:emailSignin,
-               password:passwordSignin
-            } 
+
+            const data = {
+            email:emailSignin,
+            password:passwordSignin
+         } 
          
+        
             
-            setLoading(true)
-            axios.post("http://10.240.212.213:5000/login",data)
+            setLoginLoading(true)
+            axios.post("http://localhost:5000/api/auth/login",data)
             .then(res => {
                setEmailSignin('')
                setPasswordSignin('') 
                setIsLoggedIn(true)
+               console.log(res);
+               
                AsyncStorage.setItem("user", JSON.stringify(true));
-               setLoading(false)
-               router.replace("/(tabs)/Home")
+               AsyncStorage.setItem("token", res.data.token);
+               setLoginLoading(false)
+               
+               if (res.data.role === "ADMIN") {
+                  router.replace("/(adminTabs)/Admin")
+               }else{
+                   router.replace("/(tabs)/Home")
+               }       
             })
             .catch(error => {
-               if (error.response.status === 400) {
-                  alert("Invalid Credentials! please try again.") 
-                  setEmailSignin('')
-                  setPasswordSignin('') 
-                  setLoading(false)
+               if (error.response) {
+                  if(error.response.status === 400){
+                     alert("Invalid Credentials! please try again.") 
+                     setEmailSignin('')
+                     setPasswordSignin('') 
+                     setLoginLoading(false)
+                  }
                }
                else{
                   alert('Network error. Please check your connection and try again.');
                   setEmailSignin('')
                   setPasswordSignin('') 
-                  setLoading(false)
+                  setLoginLoading(false)
                }  
             
             })
          }
       }
 
-      //upload products
-      // const pickImage = async () => {
-      //    const result = await ImagePicker.launchImageLibraryAsync({
-      //      allowsEditing: true,
-      //      quality: 1,
-      //    });
-       
-      //    if (!result.canceled) {
-      //      setImage(result.assets[0]); 
-      //    }
-      //  };
-
-
-
-
-
       const base64ToBlob = (base64, mimeType) => {
-         const byteCharacters = atob(base64.split(",")[1]); // Decode Base64
+         const byteCharacters = atob(base64.split(",")[1]); 
          const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
          const byteArray = new Uint8Array(byteNumbers);
          return new Blob([byteArray], { type: mimeType });
        };
 
 
-       const handleSubmit = () => {
-         if(name && description && price && ingredients && image){
+       const handleSubmit = async () => {
+         if(foodName && description && price && ingredients && image){
             const ingredientsArray = ingredients
             .split(",")              
             .map(item => item.trim())  
@@ -247,16 +245,16 @@ export const useFavorite = () => useContext(RecipeFavorite)
             formData.append("price", price);
             formData.append("ingredients", JSON.stringify(ingredientsArray)); 
         
-            if (image) {
-               const mimeType = image.uri.match(/data:(.*?);base64/)[1]; 
-               const blob = base64ToBlob(image.uri, mimeType);
-               formData.append("img", blob, image.fileName || "photo.jpg");
-            }
+            const mimeType = image.uri.match(/data:(.*?);base64/)[1]; 
+            const blob = base64ToBlob(image.uri, mimeType);
+            formData.append("img", blob, image.fileName || "photo.jpg");
+       
         
-            axios.post("http://10.240.212.213:5000/api/product",formData,{headers:{ "Content-Type": "multipart/form-data",}})
+            const token = await AsyncStorage.getItem("token")
+            axios.post("http://localhost:5000/api/products",formData,{headers: { Authorization: `Bearer ${token}`}})
             .then(res => {
-                console.log(res);
-                
+                console.log(res);    
+                alert(res.data.message)
             })
             .catch(error => {
                console.log(error);
@@ -267,6 +265,40 @@ export const useFavorite = () => useContext(RecipeFavorite)
          }    
        };
 
+
+       const saveProfile = async () => {
+
+         if(getProfileEmail && getProfilePassword && getProfileUsername && getProfileImage){
+            let formData = new FormData();
+            formData.append("username", getProfileUsername);
+            formData.append("password", getProfilePassword);
+            formData.append("email", getProfileEmail);
+        
+            const mimeType = getProfileImage.uri.match(/data:(.*?);base64/)[1]; 
+            const blob = base64ToBlob(getProfileImage.uri, mimeType);
+            formData.append("img", blob, getProfileImage.fileName || "photo.jpg");
+
+            const token = await AsyncStorage.getItem("token");
+            axios.put("http://localhost:5000/api/users/me",formData,{headers: { Authorization: `Bearer ${token}`}})
+           .then(res => {
+                 console.log(res.data);
+                  alert("Profile updated successfully")
+                 
+           })
+           .catch(error => {
+            if (error.response) {
+               alert(error.response)
+            }else{
+               console.log("upload profile error:",error);
+               alert("Network error!", error)
+            }
+          
+           })
+         
+         }else{
+            alert("All fields required")
+         }
+       }
 
     return <RecipeFavorite.Provider value={{
          addToFavorite,
@@ -284,6 +316,8 @@ export const useFavorite = () => useContext(RecipeFavorite)
          password,
          username,
          setUsername,
+         role,
+         setRole,
          setPasswordSignin,
          setEmailSignin,
          emailSignin,
@@ -292,6 +326,8 @@ export const useFavorite = () => useContext(RecipeFavorite)
          product,
          isLoggedIn,
          loading,
+         setLoading,
+         loginLoading,
 
          foodName,
          setFoodName,
@@ -303,7 +339,31 @@ export const useFavorite = () => useContext(RecipeFavorite)
          setIngredients,
          image,
          setImage,
-         handleSubmit
+         handleSubmit,
+
+         editPassword,
+         setEditPassword,
+         editUsername,
+         setEditUsername,
+         editEmail,
+         setEditEmail,
+         editImage,
+         setEditImage,
+         saveProfile,
+
+         getProfileEmail,
+         setGetProfileEmail,
+         getProfilePassword,
+         setGetProfilePassword,
+         getProfileUsername,
+         setGetProfileUsername,
+         getProfileImage,
+         setGetProfileImage,
+         getProfileRole,
+         setGetProfileRole,
+
+         setProduct
+        
       }}>
          {children}
     </RecipeFavorite.Provider>

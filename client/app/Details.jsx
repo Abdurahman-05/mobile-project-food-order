@@ -23,8 +23,8 @@ let { width, height } = Dimensions.get("screen");
 const Details = () => {
   const{isFavorite,removeFromFavorite,addToCart,addToFavorite,product,isInTheCart,removeFromCart} = useFavorite()
   const navigation = useNavigation();
-  const route = useRoute();
-  const { id } = route.params;
+  const route = useRoute()
+  const { id } = route.params
 
   const recipeObject = product.find((obj) => obj.id === id);
 
@@ -36,7 +36,7 @@ const Details = () => {
       {
         recipeObject ? 
         <View style={{ width: width }}>
-        <Image style={styles.detailImage} source={{ uri: `http://10.240.212.213:5000${recipeObject.img}` }} />
+        <Image style={styles.detailImage} source={{ uri: `http://localhost:5000${recipeObject.img}` }} />
         <SafeAreaView style={styles.safeArea}>
           <TouchableOpacity
             style={styles.backArrow}
@@ -53,7 +53,7 @@ const Details = () => {
           </Pressable>
         </SafeAreaView>
         <View style={styles.detailInfo}>
-          <Text>{id}</Text>
+ 
           <Text style={styles.detailTitle}>{recipeObject.name}</Text>
           <Text style={styles.description}>{recipeObject.description}</Text>
           <View>
