@@ -50,11 +50,8 @@ const registerController = async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
-<<<<<<< HEAD
         img: `/uploads/profile/${filename}`,
-=======
         role:usertype,
->>>>>>> a827c7e (role based register setup and  admin page added)
       },
     });
 
@@ -69,11 +66,7 @@ const registerController = async (req, res, next) => {
     );
     return res
       .status(201)
-<<<<<<< HEAD
       .json({newUser, accessToken, message: "User registered successfully" });
-=======
-      .json({ accessToken, message: "User registered successfully",role:newUser.role });
->>>>>>> a827c7e (role based register setup and  admin page added)
   } catch (error) {
     return next(error);
   }
