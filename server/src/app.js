@@ -1,4 +1,5 @@
 import express from "express";
+import user from "./routers/user.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -6,8 +7,16 @@ import dotenv from "dotenv";
 import prisma from "./prisma/client.js";
 import upload from "./config/multer.js"; // Assuming you're using it in routes
 import errorMiddleware from "./middlewares/errorHandler.middleware.js";
-import { standardLimiter, authLimiter, orderLimiter, adminLimiter } from "./middlewares/rateLimit.middleware.js";
-import { requestLogger, errorLogger } from "./middlewares/logging.middleware.js";
+import {
+  standardLimiter,
+  authLimiter,
+  orderLimiter,
+  adminLimiter,
+} from "./middlewares/rateLimit.middleware.js";
+import {
+  requestLogger,
+  errorLogger,
+} from "./middlewares/logging.middleware.js";
 import logger from "./utils/logger.js";
 import user from "./routers/user.js";
 import auth from "./routers/auth.js";
@@ -30,9 +39,9 @@ app.use(express.json());
 app.use(cors());
 
 // Initialize logger with environment-based log level
-logger.setLogLevel(process.env.LOG_LEVEL || 'INFO');
-const appLogger = logger.createLogger('App');
-appLogger.info('Application starting up');
+logger.setLogLevel(process.env.LOG_LEVEL || "INFO");
+const appLogger = logger.createLogger("App");
+appLogger.info("Application starting up");
 
 // Apply request logging middleware
 app.use(requestLogger);
@@ -73,7 +82,11 @@ app.use(errorLogger);
 app.use(errorMiddleware);
 
 // Log application startup
-appLogger.info(`Server environment: ${process.env.NODE_ENV || 'development'}`);
-appLogger.info(`Server ready to accept connections on port ${process.env.PORT || 5000}`);
+appLogger.info(`Server environment: ${process.env.NODE_ENV || "development"}`);
+appLogger.info(
+  `Server ready to accept connections on port ${process.env.PORT || 5000}`
+);
+//Routes
+app.use("/api", user);
 
 export default app;
