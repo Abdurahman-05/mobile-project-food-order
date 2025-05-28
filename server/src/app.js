@@ -1,5 +1,5 @@
 import express from "express";
-import user from "./routers/user.js";
+import user from "./routers/order.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -87,6 +87,6 @@ appLogger.info(
   `Server ready to accept connections on port ${process.env.PORT || 5000}`
 );
 //Routes
-app.use("/api", user);
+app.use("/api", order);
 
 export default app;
